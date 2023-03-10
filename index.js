@@ -420,7 +420,7 @@ async function run() {
       }
     });
     // add blog
-    app.post("/blogs", verifyJWT, async (req, res) => {
+    app.post("/blogs", async (req, res) => {
       const query = req.body;
       const result = await blogsCollection.insertOne(query);
       res.send(result);
@@ -432,7 +432,7 @@ async function run() {
     });
 
     //user delete
-    app.delete("/users/admin/:id", async (req, res) => {
+    app.delete("/blogs/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await blogsCollection.deleteOne(query);
