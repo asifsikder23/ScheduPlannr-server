@@ -77,9 +77,9 @@ async function run() {
       .db("ScheduPlannr")
       .collection("sixtyMinsPM");
     //Create Schedule
-    const createSchedule = client
+    const createSchedulee = client
       .db("ScheduPlannr")
-      .collection("createSchedule");
+      .collection("scheduleCreate");
 
     // Team
     const teamCollection = client.db("ScheduPlannr").collection("team");
@@ -287,25 +287,31 @@ async function run() {
     });
 
     //create schedule
-    app.post("/createSchedule", async (req, res) => {
+    // app.post("/createSchedule", async (req, res) => {
+    //   const schedule = req.body;
+    //   const query = {
+    //     email: schedule.email,
+    //     // slot: schedule.slot,
+    //     // slotPm: schedule.slotPm,
+    //   };
+    //   const alreadyBooked = await createSchedule.find(query).toArray();
+    //   // if (alreadyBooked.length) {
+    //   //   const message = `You have already booked on ${schedule.slot || schedule.slotPm
+    //   //     }`;
+    //   //   return res.send({ acknowledged: false, message });
+    //   // }
+    //   const result = await createSchedule.insertOne(schedule);
+    //   res.send(result);
+    // });
+
+    app.post("/createSchedulee", async (req, res) => {
       const schedule = req.body;
-      const query = {
-        email: schedule.email,
-        slot: schedule.slot,
-        slotPm: schedule.slotPm,
-      };
-      const alreadyBooked = await createSchedule.find(query).toArray();
-      if (alreadyBooked.length) {
-        const message = `You have already booked on ${schedule.slot || schedule.slotPm
-          }`;
-        return res.send({ acknowledged: false, message });
-      }
-      const result = await createSchedule.insertOne(schedule);
+      const result = await createSchedulee.insertOne(schedule);
       res.send(result);
-    });
+    })
 
     // update schedule
-    app.put("/createSchedule/:id", async (req, res) => {
+    app.put("/createSchedulee/:id", async (req, res) => {
       const id = req.params.id;
       const filter = {
         _id: ObjectId(id),
@@ -324,7 +330,7 @@ async function run() {
           phone: schedule.phone,
         },
       };
-      const result = await createSchedule.updateOne(
+      const result = await createSchedulee.updateOne(
         filter,
         updateSchedule,
         option
@@ -333,10 +339,10 @@ async function run() {
     });
 
     // delete schedule
-    app.delete("/createSchedule/:id", async (req, res) => {
+    app.delete("/createSchedulee/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
-      const result = await createSchedule.deleteOne(query);
+      const result = await createSchedulee.deleteOne(query);
       res.send(result);
     });
 
@@ -344,17 +350,7 @@ async function run() {
     app.get("/mySchedule", async (req, res) => {
       const email = req.query.email;
       const query = { email: email };
-      const mySchedule = await createSchedule.find(query).toArray();
-      res.send(mySchedule);
-    });
-
-    // get Schedule
-    app.get("/createSchedule/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = {
-        _id: ObjectId(id),
-      };
-      const mySchedule = await createSchedule.findOne(query);
+      const mySchedule = await createSchedulee.find(query).toArray();
       res.send(mySchedule);
     });
 
@@ -467,22 +463,6 @@ async function run() {
       res.send(cursor);
     })
 
-    // app.put("/availability/:id", async (req, res) => {
-    //   const id = req.params.id;
-    //   const filter = { _id: ObjectId(id) };
-    //   const availabilityy = req.body;
-    //   const option = { upsert: true };
-    //   const updateAvailability = {
-    //     $set: {
-    //       start_time: availabilityy.start_time,
-    //       end_time: availabilityy.end_time
-    //     }
-    //   };
-    //   console.log(availabilityy);
-    //   const result = await availability.updateOne(filter, updateAvailability, option);
-    //   res.send(result);
-    // })
-
     //Yeasin Arafat
     // Nodemailer setup
     const transporter = nodemailer.createTransport({
@@ -505,11 +485,11 @@ async function run() {
         from: process.env.EMAIL,
         to: email,
         subject: "Schedule Confirmation",
-        text: 
-        `Hi ${name},
+        text:
+          `Hi ${name},
         Your organization name is ${organization}. It will be start on ${value
-          ?.toString()
-          .slice(0, 15)} at ${slot} and 
+            ?.toString()
+            .slice(0, 15)} at ${slot} and 
           Your Meeting Link is ${link}`,
       };
       transporter.sendMail(mailOptions, (error, info) => {
@@ -532,8 +512,8 @@ async function run() {
         from: process.env.EMAIL,
         to: email,
         subject: "Payment Confirmation",
-        text: 
-        `Hi
+        text:
+          `Hi
         ${name}, 
         Your payment of $${amount / 100} has been successful.
         Visit Our Website : https://schedu-plannr.web.app/
